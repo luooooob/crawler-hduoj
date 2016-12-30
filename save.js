@@ -1,12 +1,15 @@
-var request = require('request');
-var cheerio = require('cheerio');
+const request = require('request');
+const cheerio = require('cheerio');
 // var async = require('async');
 // var fs = require('fs');
 
-
 var username = '572058317' 
-var userpass = 'nibushi12'
+var userpass = 'password'
+
+
 var loginUrl = 'http://acm.hdu.edu.cn/userloginex.php?action=login'
+var codeUrls = new Array()
+
 
 var signedOption = {
     set: function() {
@@ -14,6 +17,7 @@ var signedOption = {
       this.headers = {cookie: session}
     }
 }
+
 
 var loginOption = {
     set: function() {
@@ -40,6 +44,7 @@ var login = function(callback) {
     });
 }
 
+
 var getProblemUrls = function() {
     request(signedOption,
     function(error, response, body) {
@@ -54,5 +59,6 @@ var getProblemUrls = function() {
         }
     })
 }
+
 
 login(getProblemUrls)
