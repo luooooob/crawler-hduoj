@@ -7,7 +7,7 @@ const async = require('async')
     配置账号密码
 ================================================================= */
 const username = '572058317'
-const userpass = 'password'
+const userpass = 'pass'
 
 
 // 部分网址常量
@@ -55,7 +55,7 @@ const login = function(callback) {
         if (!error) {
             var session = response.headers['set-cookie']
             onlineOption.setCookie(session)
-            callback()
+            callback(getProblemUrls)
         }
     })
 }
@@ -83,23 +83,26 @@ const requestUserInfo = function() {
     })
 }
 
-const getProblemUrls = function() {
-    if(!userData.getProblemUrls) {
+const getProblemUrls = function(callback) {
+    console.log(onlineOption)
+    if(!userData.codeUrls.length) {
         onlineOption.url = searchUrl
     }
     request(onlineOption, 
     function(error, response, body) {
+        if(error) {
+            console.log(error)
+        }
         if(!error) {
             body = Iconv.decode(body, 'gb2312').toString()
             var codeUrls = body.match(/\/viewcode\.php\?rid=\d+/g)
-            var next = body.match(/\/status\.php\?first=.*(?=">Next)/g)[0]
-            if(codeUrls) {
-                userData.codeUrls += codeUrls
-                codeUrls = null
-                onlineOption.url = next
-                getProblemUrls()
+            userData.codeUrls += codeUrls
+            var next = body.match(/\/status\.php\?first=.*(?=">Next)/g)
+            if(next) {
+                onlineOption.url = webSite + next
+                callback(getProblemUrls)
             } else {
-                console.log(userData.codeUrls)
+                console.log(userData.codeUrls.split(',').length)
                 return
             }
         }
@@ -108,5 +111,4 @@ const getProblemUrls = function() {
 
 exports.start = function() {
     login(getProblemUrls)
-    console.log(userData.codeUrls)
 }
