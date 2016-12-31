@@ -7,7 +7,7 @@ const async = require('async')
     配置账号密码
 ================================================================= */
 const username = '572058317'
-const userpass = 'pass'
+const userpass = 'password'
 
 
 // 部分网址常量
@@ -52,7 +52,9 @@ var onlineOption = {
 ================================================================= */
 const login = function(callback) {
     request.post(loginOption, function(error, response, body) {
-        if (!error) {
+        if (error) {
+            console.log(error)
+        } else {
             var session = response.headers['set-cookie']
             onlineOption.setCookie(session)
             callback(getProblemUrls)
@@ -84,7 +86,6 @@ const requestUserInfo = function() {
 }
 
 const getProblemUrls = function(callback) {
-    console.log(onlineOption)
     if(!userData.codeUrls.length) {
         onlineOption.url = searchUrl
     }
@@ -92,18 +93,16 @@ const getProblemUrls = function(callback) {
     function(error, response, body) {
         if(error) {
             console.log(error)
-        }
-        if(!error) {
+        } else {
             body = Iconv.decode(body, 'gb2312').toString()
             var codeUrls = body.match(/\/viewcode\.php\?rid=\d+/g)
-            userData.codeUrls += codeUrls
+            userData.codeUrls = userData.codeUrls.concat(codeUrls)
             var next = body.match(/\/status\.php\?first=.*(?=">Next)/g)
             if(next) {
                 onlineOption.url = webSite + next
                 callback(getProblemUrls)
             } else {
-                console.log(userData.codeUrls.split(',').length)
-                return
+                console.log(userData.codeUrls.length)
             }
         }
     })
