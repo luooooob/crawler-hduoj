@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/SSRius/crawler-hduoj/issues"
   },
-  "homepage": "https://github.com/SSRius/crawler-hduoj#readme"
+  "homepage": "https://github.com/SSRius/crawler-hduoj#readme",
+  "dependencies": {
+    "async": "^2.1.4",
+    "fs": "^0.0.1-security",
+    "iconv-lite": "^0.4.15",
+    "request": "^2.79.0"
+  }
 }
