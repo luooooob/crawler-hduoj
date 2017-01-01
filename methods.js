@@ -10,7 +10,7 @@ const fs = require('fs')
  */
 
 const username = 'username'
-const userpass = 'password'
+const userpass = 'userpass'
 
 /**
  * ------------------------------------------------------------------------
@@ -48,24 +48,27 @@ var onlineOption = {
  * async模块进行流程控制，简化回调函数
  * ------------------------------------------------------------------------
  */
-exports.start = async.series({
-    login: function(callback) {
-        login(callback)
-    },
-    requestUserInfo: function(callback) {
-        requestUserInfo(callback)
-    },
-    requestProblemUrls: function(callback) {
-        requestProblemUrls(callback)
-    },
-	limit: function(callback) {
-		limit(callback)
-	}
-},function(err, results) {
-    if(!err) {
-		console.log('---结束---')
-	} 
-})
+function start() {
+	async.series({
+		login: function(callback) {
+        	login(callback)
+		},
+		requestUserInfo: function(callback) {
+			requestUserInfo(callback)
+		},
+		requestProblemUrls: function(callback) {
+			requestProblemUrls(callback)
+		},
+		limit: function(callback) {
+			limit(callback)
+		}
+	}, function(err, results) {
+		if(!err) {
+			console.log('---结束---')
+		}
+	})
+}
+exports.start = start
 
 
 /**
@@ -100,9 +103,9 @@ function requestUserInfo(callback) {
         if(error) {
             console.log(error + 'user info request error')
         } else if(/action=logout/g.test(body)){
-            //用iconv-lite模块将gb2312转码成utf-8
+            //iconv-lite模块将gb2312转码为utf-8
             body = Iconv.decode(body, 'gb2312').toString()
-            console.log('登录成功')
+            console.log('---登录成功---')
             var name = body.match(/>.*(?=<\/h1>)/g)[0].substr(1)
             var userInfoList = body.match(/\d+(?=<\/td><\/tr>)/g)
             userData = {
@@ -112,22 +115,33 @@ function requestUserInfo(callback) {
                 accept: userInfoList[4],
                 solved: userInfoList[2],
             }
+			printUserData(userData)
             callback(null, true)
         } else {
             console.log('登录失败, 请检查账号密码')
         }
     })
 }
+function printUserData(userData) {
+	console.log(
+		'账号: ' + username
+		+ '\n昵称: ' + userData.name
+		+ '\nHDU rank: ' + userData.rank
+		+ '\nsubmit: ' + userData.submit
+		+ '\naccpet: ' + userData.accept
+		+ '\nsolved: ' + userData.solved 
+	)
+}
 
 
 /**
  * ------------------------------------------------------------------------
- * 在查找页面(judge status)正则匹配所有查看代码地址，如果匹配到还有下一页，就递归执行
- * 此函数
+ * 在查找页面(judge status)正则匹配所有代码的地址，以及如果匹配到下一页链接，就递归
+ * 执行此函数
  * ------------------------------------------------------------------------
  */
 function requestProblemUrls(callback) {
-	// 第一次执行要初始化searchUrl
+	// 首次执行，初始化searchUrl
     if(!codeUrls.length) {
         onlineOption.url = searchUrl
     }
@@ -136,6 +150,7 @@ function requestProblemUrls(callback) {
         if(error) {
             console.log(error + 'serach request error')
         } else {
+			//iconv-lite模块将gb2312转码为utf-8
             body = Iconv.decode(body, 'gb2312').toString()
             var codeUrl = body.match(/\/viewcode\.php\?rid=\d+/g)
             codeUrls = codeUrls.concat(codeUrl)
@@ -179,18 +194,20 @@ function requestAndSaveCode (url, callback) {
 	onlineOption.url = webSite + url
 	request(onlineOption, function(error,response,body) {
 		if(error) {
-			console.log(error + 'code request error')
+			console.log(error + 'code request error' + url)
 		} else {
 			body = Iconv.decode(body, 'gb2312').toString()
-			var code = body.match(/#include[\w\W]*(?=<\/textarea>)/g)[0]
+			// 一开始用'#include'匹配，换其他人账号有错误，检查发现该代码
+			// 是'# include'开头......
+			var code = body.match(/#\s*include[\w\W]*(?=<\/textarea>)/g)[0]
 			code = escape(code)
 			var problem = body.match(/\d{4}\s.*\)(?=<\/a>)/g)[0]
 			var problemID = 'HDU' + problem.match(/\d{4}/g)[0]
 			var stars = '*************************************************'
 			var comment = '\n/' + stars + '\nProblem: HDU'+ problem 
-						+ '\nLanguage: C/C++\n'+'Author: '+ userData.name 
-						+'\n' + stars + '/\n\n'
-			fs.appendFile('./cpp/' + problemID + '.cpp',comment + code)
+						+ '\nLanguage: C/C++\n'+'Author: '+ username 
+						+ '(' + userData.name +')\n' + stars + '/\n\n'
+			fs.appendFile('cpps/' + problemID + '.cpp',comment + code)
 			callback(null, 'save successful')
 		}
 	})
