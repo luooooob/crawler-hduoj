@@ -6,8 +6,8 @@ const methods = require ('./methods.js')
  * ------------------------------------------------------------------------
  */
 
-const username = '572058317'
-const userpass = 'nibushi12'
+const username = 'username'
+const userpass = 'userpass'
 
 /**
  * ------------------------------------------------------------------------

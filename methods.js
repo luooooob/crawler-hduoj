@@ -19,8 +19,8 @@ var onlineOption = function (url) {
 
 /**
  * ------------------------------------------------------------------------
- * 在loginOption设置formData去post登录地址,返回的response.headers中
- * 有个'set-cookie'属性, 
+ * option设置formData去post登录地址,返回的response.headers中有个'set-cookie'
+ * 属性，后面的请求头只要带上这个cookie就是登录状态
  * ------------------------------------------------------------------------
  */
 
@@ -80,7 +80,7 @@ function analyseInfoPage(body,callback) {
         userData.submit = userInfoList[3],
         userData.accept = userInfoList[4],
         userData.solved = userInfoList[2],
-        //printUserData(userData)
+        printUserData(userData)
         callback(null, true)
     } else {
         console.log('登录失败, 请检查账号密码')
@@ -105,27 +105,40 @@ function printUserData(userData) {
  * 执行此函数
  * ------------------------------------------------------------------------
  */
-function requestCodeUrls(callback) {
+
+function requestStatusPages(callback) {
 	// 首次执行，初始化searchUrl
     if(!codeUrls.length) {
         var option = new onlineOption(webSite 
         + '/status.php?first=&pid=&user=' 
         + userData.username + '&lang=0&status=5')
     }
-    requestNextCodeUrlsPage(option, callback)
+    requestNextStatusPage(option, callback)
 }
 
-function requestNextCodeUrlsPage(option, callback) {
+/**
+ * ------------------------------------------------------------------------
+ * 递归请求下一页
+ * ------------------------------------------------------------------------
+ */
+
+function requestNextStatusPage(option, callback) {
     request(option, function(error, response, body) {
         if(error) {
             console.log(error + 'serach request error')
         } else {
-            analyseCodeUrlsPage(body,callback)
+            analyseStatusPage(body,callback)
         }
     })
 }
 
-function analyseCodeUrlsPage(body,callback) {
+/**
+ * ------------------------------------------------------------------------
+ * 解析status页面
+ * ------------------------------------------------------------------------
+ */
+
+function analyseStatusPage(body,callback) {
     // iconv-lite模块将gb2312转码为utf-8
     body = Iconv.decode(body, 'gb2312').toString()
     var codeUrl = body.match(/\/viewcode\.php\?rid=\d+/g)
@@ -133,7 +146,7 @@ function analyseCodeUrlsPage(body,callback) {
     var next = body.match(/\/status\.php\?first=.*(?=">Next)/g)
     if(next) {
         option = new onlineOption(webSite + next[0])
-        requestNextCodeUrlsPage(option, callback)
+        requestNextStatusPage(option, callback)
     } else {
         callback(null, true)
     }
@@ -174,6 +187,13 @@ function requestAndSaveCode (url, callback) {
 		}
 	})
 }
+
+/**
+ * ------------------------------------------------------------------------
+ * 解析代码页面
+ * ------------------------------------------------------------------------
+ */
+
 function analyseCodePage(body, callback) {
     // iconv-lite模块将gb2312转码为utf-8
     body = Iconv.decode(body, 'gb2312').toString()
@@ -218,7 +238,7 @@ function start(username,userpass) {
             requestUserInfo(callback)
         },
         requestProblemUrls: function(callback) {6
-            requestCodeUrls(callback)
+            requestStatusPages(callback)
         },
         requestCodesLimit: function(callback) {
             requestCodesLimit(callback)
