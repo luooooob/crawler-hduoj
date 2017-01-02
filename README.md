@@ -1,6 +1,6 @@
-# crawler-hduoj
+# HDUOJ代码爬虫
 
-> web crawler program to save all pass codes which you submit
+> A web crawler program to save all pass codes which you submit
 
 ## Build Setup
 
@@ -8,6 +8,6 @@
 # install dependencies
 npm install
 
-# change your username and password in ./methods.js, then
+# change your username and password in ./start.js, then
 node start
 ```
