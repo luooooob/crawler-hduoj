@@ -80,7 +80,7 @@ function analyseInfoPage(body,callback) {
         userData.submit = userInfoList[3],
         userData.accept = userInfoList[4],
         userData.solved = userInfoList[2],
-        printUserData(userData)
+        //printUserData(userData)
         callback(null, true)
     } else {
         console.log('登录失败, 请检查账号密码')
