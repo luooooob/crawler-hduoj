@@ -1,6 +1,5 @@
-# crawler-hduoj
-
-> web crawler program to save all pass codes which you submit
+# HDUOJ代码爬虫
+> a web crawler program to save all pass codes which you submit
 
 ## Build Setup
 
