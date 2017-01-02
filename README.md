@@ -6,10 +6,10 @@
 
 install dependencies
 ``` bash
-npm install
+➜  npm install
 ```
 
 input your username and password in start.js, then
 ``` bash
-node start
+➜  node start
 ```
