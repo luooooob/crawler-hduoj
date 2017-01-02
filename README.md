@@ -4,10 +4,12 @@
 
 ## Usage
 
+install dependencies
 ``` bash
-# install dependencies
 npm install
+```
 
-# change your username and password in ./start.js, then
+input your username and password in start.js, then
+``` bash
 node start
 ```
