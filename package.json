@@ -4,7 +4,8 @@
   "description": "a web crawler program to save all pass codes which you submit.",
   "main": "start.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node config.js"
   },
   "repository": {
     "type": "git",

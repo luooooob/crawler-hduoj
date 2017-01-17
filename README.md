@@ -1,15 +1,16 @@
 # HDUOJ代码爬虫
 
-> A web crawler program to save all pass codes which you submit
+> 一个node爬虫，用来保存杭电OJ上所有提交通过的代码
 
-## Usage
+## 用法
 
-install dependencies
+node环境，安装依赖
 ``` bash
 ➜  npm install
 ```
 
-input your username and password in start.js, then
+在config.js里输入用户名密码，然后
+
 ``` bash
-➜  node start
+➜  npm run start
 ```

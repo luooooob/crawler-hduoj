@@ -161,6 +161,12 @@ function analyseStatusPage(body,callback) {
 function requestCodesLimit(callback) {
     console.log('开始请求所有代码')
     console.log('代码数： ' + codeUrls.length + '\t并发: 5')
+    // 创建文件夹
+    fs.mkdir('./cpps/', (error) => {
+        if(error) {
+            console.log('mkdir error' + error)
+        }
+    })
 	async.mapLimit(codeUrls, 5, function(url, callback) {
 		requestAndSaveCode(url, callback)
 	},function(error,result) {
@@ -207,7 +213,7 @@ function analyseCodePage(body, callback) {
     var comment = '\n/' + stars + '\nProblem: HDU' + problem 
                 + '\nLanguage: C/C++\n'+'Author: ' + userData.username 
                 + '(' + userData.name +')\n' + stars + '/\n\n'
-    fs.appendFile('cpps/' + problemID + '.cpp',comment + code)
+    fs.appendFileSync('cpps/' + problemID + '.cpp',comment + code)
     callback(null, 'save successful')
 }
 /**
